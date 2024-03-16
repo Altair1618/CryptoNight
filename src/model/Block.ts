@@ -57,6 +57,6 @@ export class Block {
       result[i] = this.data[i] ^ block.getData()[i];
     }
 
-    return new Block(result);
+    return new Block(result, size === BLOCK_SIZE_BYTE / 2);
   }
 }
