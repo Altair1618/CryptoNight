@@ -1,5 +1,6 @@
 import { Block } from "@/model/Block";
 import { fisherYatesShuffler } from "./fisher-yates";
+import { roundFunction } from "./round-function";
 
 export function feistel(
   data: Block,
@@ -14,25 +15,52 @@ export function feistel(
   // Feistel Network
   let result: Block = data;
   for (let i = 0; i < rounds; i++) {
-    const key = isEncrypt ? keys[i] : keys[rounds - i - 1];
-
-    let left = new Block(
-      result.getHexData().slice(0, result.getHexData().length / 2),
-      true
-    );
-
-    let right = new Block(
-      result.getHexData().slice(result.getHexData().length / 2),
-      true
-    );
-
-    const temp = left;
-    left = fisherYatesShuffler(left, key, !isEncrypt);
-    left = left.xor(right);
-    right = temp;
-
-    result = new Block(left.getHexData() + right.getHexData());
+    result = isEncrypt
+      ? feistelEncryptRound(result, keys[i])
+      : feistelDecryptRound(result, keys[rounds - i - 1]);
   }
 
   return result;
+}
+
+function feistelEncryptRound(data: Block, key: Block): Block {
+  let left = new Block(
+    data.getHexData().slice(0, data.getHexData().length / 2),
+    true
+  );
+
+  let right = new Block(
+    data.getHexData().slice(data.getHexData().length / 2),
+    true
+  );
+
+  left = fisherYatesShuffler(left, key, false);
+  right = fisherYatesShuffler(right, key, false);
+
+  let encLeft = right;
+  let encRight = roundFunction(right, key);
+  encRight = encRight.xor(left);
+
+  return new Block(encLeft.getHexData() + encRight.getHexData());
+}
+
+function feistelDecryptRound(data: Block, key: Block): Block {
+  let left = new Block(
+    data.getHexData().slice(0, data.getHexData().length / 2),
+    true
+  );
+
+  let right = new Block(
+    data.getHexData().slice(data.getHexData().length / 2),
+    true
+  );
+
+  let decRight = left;
+  let decLeft = roundFunction(decRight, key);
+  decLeft = decLeft.xor(right);
+  
+  decRight = fisherYatesShuffler(decRight, key, true);
+  decLeft = fisherYatesShuffler(decLeft, key, true);
+
+  return new Block(decLeft.getHexData() + decRight.getHexData());
 }
