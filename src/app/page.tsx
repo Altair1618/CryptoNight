@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -15,12 +15,7 @@ export default function Home() {
       </div>
 
       <div className="mb-32 flex items-center justify-center text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30 mr-3"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Link href="/text" className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30 mr-3">
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Text Input{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
@@ -30,14 +25,9 @@ export default function Home() {
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
             Got a message on your mind? Type it directly for secure encryption!
           </p>
-        </a>
+        </Link>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Link href="/file" className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30">
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Binary File Input{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
@@ -47,7 +37,7 @@ export default function Home() {
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
             Need to encrypt a larger secret? Upload your binary file here!
           </p>
-        </a>
+        </Link>
       </div>
     </main>
   );
