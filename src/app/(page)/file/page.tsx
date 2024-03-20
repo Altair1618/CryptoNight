@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import UploadImage from "@/assets/images/upload.png";
 import { CipherRequest, CipherResponse } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import CipherApi from '@/api';
+import CipherApi from '@/api';
 
 const FormSchema = z.object({
     input: z.any(),
@@ -91,7 +91,7 @@ const InputTextPage: React.FC = () => {
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
             const payload: CipherRequest = {
-                input: data.input,
+                input: messageData,
                 key: data.key,
                 initialVector: data.initialVector,
                 mode: data.mode,
@@ -99,10 +99,10 @@ const InputTextPage: React.FC = () => {
             };
             setOnUpdate(true);
     
-            /* const submitResponse: CipherResponse = await CipherApi.cryptonightEncryption(payload);
+            const submitResponse: CipherResponse = await CipherApi.cryptonightEncryption(payload);
             if (submitResponse.success) {
                 setResult(submitResponse.output);
-            } */
+            }
         } catch (error) {
             toast.error((error as any)?.message || 'Server is unreachable. Please try again later.');
         } finally {
@@ -266,7 +266,7 @@ const InputTextPage: React.FC = () => {
                         </div>}
                     </div>
                     {result ? 
-                        <div className="mx-auto h-40 max-w-[70rem] overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
+                        <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
                         {result}</div>
                         : 
                         <div>Please fill the encyption/decription form above first</div>
