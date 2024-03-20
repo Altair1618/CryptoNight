@@ -1,6 +1,7 @@
 import { Block } from "@/model/Block";
 import { fisherYatesShuffler } from "./fisher-yates";
 import { roundFunction } from "./round-function";
+import { generateRoundKeys } from "./key-scheduling";
 
 export function feistel(
   data: Block,
@@ -9,8 +10,7 @@ export function feistel(
   isEncrypt: boolean
 ): Block {
   // TODO: Implement Key Scheduling
-  const keys = new Array<Block>(rounds);
-  keys.fill(key); // Temporary
+  const keys = generateRoundKeys(key, rounds);
 
   // Feistel Network
   let result: Block = data;
