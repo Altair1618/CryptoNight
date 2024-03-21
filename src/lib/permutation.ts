@@ -75,3 +75,56 @@ export function permutation(state: number[][]): number[][] {
   let permutedState = mixColumns(shiftedState);
   return permutedState;
 }
+
+export function invShiftRows(state: number[][]): number[][] {
+  let tempState = [...state];
+  for (let row = 1; row < 4; row++) {
+    tempState[row] = shiftRight(tempState[row], row);
+  }
+  return tempState;
+}
+
+export function shiftRight(row: number[], shifts: number): number[] {
+  let temp = row.slice();
+  for (let i = 0; i < shifts; i++) {
+    temp.unshift(temp.pop()!);
+  }
+  return temp;
+}
+
+export function invMixColumns(state: number[][]): number[][] {
+  let tempState = [...state.map((row) => [...row])];
+  for (let col = 0; col < 4; col++) {
+    let s0 = state[0][col],
+      s1 = state[1][col],
+      s2 = state[2][col],
+      s3 = state[3][col];
+    tempState[0][col] =
+      multiplyInGF(0x0e, s0) ^
+      multiplyInGF(0x0b, s1) ^
+      multiplyInGF(0x0d, s2) ^
+      multiplyInGF(0x09, s3);
+    tempState[1][col] =
+      multiplyInGF(0x09, s0) ^
+      multiplyInGF(0x0e, s1) ^
+      multiplyInGF(0x0b, s2) ^
+      multiplyInGF(0x0d, s3);
+    tempState[2][col] =
+      multiplyInGF(0x0d, s0) ^
+      multiplyInGF(0x09, s1) ^
+      multiplyInGF(0x0e, s2) ^
+      multiplyInGF(0x0b, s3);
+    tempState[3][col] =
+      multiplyInGF(0x0b, s0) ^
+      multiplyInGF(0x0d, s1) ^
+      multiplyInGF(0x09, s2) ^
+      multiplyInGF(0x0e, s3);
+  }
+  return tempState;
+}
+
+export function inversePermutation(state: number[][]): number[][] {
+  let mixedState = invMixColumns(state);
+  let restoredState = invShiftRows(mixedState);
+  return restoredState;
+}
