@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { permutation, permutationString } from "@/lib/permutation";
 import { Block } from "@/model/Block";
 import { decrypt_ecb, encrypt_ecb } from "@/lib/cryptonight";
 

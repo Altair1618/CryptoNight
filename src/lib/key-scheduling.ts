@@ -9,15 +9,14 @@ export function generateRoundKeys(key: Block, rounds: number): Block[] {
 
   // Iteration for key every round
   // Using seed from prev key to output newest key
-  for (let i = 0; i < rounds; i++) {
+  for (let i = 1; i < rounds; i++) {
     let seed = keys[i - 1];
     let currentKeyData = fisherYatesShuffler(
-      new Block(seed.getHexData(), true),
+      new Block(seed.getHexData()),
       seed,
       true
     ).getHexData();
-    keys[i] = new Block(currentKeyData, true);
+    keys[i] = new Block(currentKeyData);
   }
-
   return keys;
 }
