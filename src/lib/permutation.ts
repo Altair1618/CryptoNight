@@ -1,5 +1,7 @@
+import { Block } from "@/model/Block";
+
 // Shift Rows
-export function shiftRows(state: number[][]): number[][] {
+function shiftRows(state: number[][]): number[][] {
   let tempState = [...state];
   for (let row = 1; row < 4; row++) {
     tempState[row] = shiftLeft(tempState[row], row);
@@ -7,7 +9,7 @@ export function shiftRows(state: number[][]): number[][] {
   return tempState;
 }
 
-export function shiftLeft(row: number[], shifts: number): number[] {
+function shiftLeft(row: number[], shifts: number): number[] {
   // Copy the row
   let temp = row.slice();
   for (let i = 0; i < shifts; i++) {
@@ -18,7 +20,7 @@ export function shiftLeft(row: number[], shifts: number): number[] {
 }
 
 // Mix Columns
-export function multiplyInGF(a: number, b: number): number {
+function multiplyInGF(a: number, b: number): number {
   let p = 0;
   let hiBitSet;
   for (let i = 0; i < 8; i++) {
@@ -43,7 +45,7 @@ export function multiplyInGF(a: number, b: number): number {
   return p & 0xff;
 }
 
-export function mixColumns(state: number[][]): number[][] {
+function mixColumns(state: number[][]): number[][] {
   let tempState = [...state.map((row) => [...row])];
   for (let col = 0; col < 4; col++) {
     tempState[0][col] =
@@ -70,13 +72,13 @@ export function mixColumns(state: number[][]): number[][] {
   return tempState;
 }
 
-export function permutation(state: number[][]): number[][] {
+function permutation(state: number[][]): number[][] {
   let shiftedState = shiftRows(state);
   let permutedState = mixColumns(shiftedState);
   return permutedState;
 }
 
-export function invShiftRows(state: number[][]): number[][] {
+function invShiftRows(state: number[][]): number[][] {
   let tempState = [...state];
   for (let row = 1; row < 4; row++) {
     tempState[row] = shiftRight(tempState[row], row);
@@ -84,7 +86,7 @@ export function invShiftRows(state: number[][]): number[][] {
   return tempState;
 }
 
-export function shiftRight(row: number[], shifts: number): number[] {
+function shiftRight(row: number[], shifts: number): number[] {
   let temp = row.slice();
   for (let i = 0; i < shifts; i++) {
     temp.unshift(temp.pop()!);
@@ -92,7 +94,7 @@ export function shiftRight(row: number[], shifts: number): number[] {
   return temp;
 }
 
-export function invMixColumns(state: number[][]): number[][] {
+function invMixColumns(state: number[][]): number[][] {
   let tempState = [...state.map((row) => [...row])];
   for (let col = 0; col < 4; col++) {
     let s0 = state[0][col],
@@ -123,8 +125,44 @@ export function invMixColumns(state: number[][]): number[][] {
   return tempState;
 }
 
-export function inversePermutation(state: number[][]): number[][] {
+function inversePermutation(state: number[][]): number[][] {
   let mixedState = invMixColumns(state);
   let restoredState = invShiftRows(mixedState);
   return restoredState;
+}
+
+export function permutationString(input: Block): Block {
+  let state = input.getHexData();
+  let stateArray: number[][] = [[], [], [], []];
+
+  for (let i = 0; i < state.length; i += 2) {
+    stateArray[Math.floor(i / 8)].push(parseInt(state[i] + state[i + 1], 16));
+  }
+
+  let permutedState = permutation(stateArray);
+  let result = permutedState
+    .map((row) =>
+      row.map((cell) => cell.toString(16).padStart(2, "0")).join("")
+    )
+    .join("");
+  return new Block(result);
+}
+
+export function inversePermutationString(input: Block): Block {
+  let state = input.getHexData();
+  let stateArray: number[][] = [[], [], [], []];
+
+  for (let i = 0; i < state.length; i += 2) {
+    let rowIndex = Math.floor((i / 2) % 4);
+    let colIndex = Math.floor(i / 2 / 4);
+    stateArray[rowIndex][colIndex] = parseInt(state.substring(i, i + 2), 16);
+  }
+
+  let restoredState = inversePermutation(stateArray);
+  let resultHex = restoredState
+    .flatMap((row) => row)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return new Block(resultHex);
 }
