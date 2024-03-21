@@ -20,20 +20,14 @@ import CipherApi from '@/api';
 const FormSchema = z.object({
     input: z.string().min(1, {
         message: "Input text is required and cannot be empty.",
-    }).max(16, {
-        message: "Input text cannot be longer than 16 characters.",
     }),
 
-    key: z.string().min(1, {
-        message: "Cipher key is required and cannot be empty.",
-    }).max(16, {
-        message: "Cipher key cannot be longer than 16 characters.",
+    key: z.string().refine(async (val) => val.length == 16, {
+        message: "Cipher key length must be equal to 16.",
     }),
 
-    initialVector: z.string().min(1, {
-        message: "Initial vector is required and cannot be empty.",
-    }).max(16, {
-        message: "Initial vector cannot be longer than 16 characters.",
+    initialVector: z.string().refine(async (val) => val.length == 16, {
+        message: "Initial vector length must be equal to 16.",
     }),
 
     mode: z.string({
