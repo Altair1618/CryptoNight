@@ -9,7 +9,6 @@ export function feistel(
   rounds: number,
   isEncrypt: boolean
 ): Block {
-  // TODO: Implement Key Scheduling
   const keys = generateRoundKeys(key, rounds);
 
   // Feistel Network
@@ -23,7 +22,7 @@ export function feistel(
   return result;
 }
 
-function feistelEncryptRound(data: Block, key: Block): Block {
+export function feistelEncryptRound(data: Block, key: Block): Block {
   let left = new Block(
     data.getHexData().slice(0, data.getHexData().length / 2),
     true
@@ -44,7 +43,7 @@ function feistelEncryptRound(data: Block, key: Block): Block {
   return new Block(encLeft.getHexData() + encRight.getHexData());
 }
 
-function feistelDecryptRound(data: Block, key: Block): Block {
+export function feistelDecryptRound(data: Block, key: Block): Block {
   let left = new Block(
     data.getHexData().slice(0, data.getHexData().length / 2),
     true
