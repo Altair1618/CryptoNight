@@ -1,7 +1,17 @@
 import React from "react";
 import Link from "next/link";
+import { permutation, permutationString } from "@/lib/permutation";
+import { Block } from "@/model/Block";
+import { decrypt_ecb, encrypt_ecb } from "@/lib/cryptonight";
 
 export default function Home() {
+  let input: string = "HELLO, WORLD!";
+  let key: string = "YELLOW SUBMARINE";
+  
+  const encrypted = encrypt_ecb(input, key);
+  console.log(encrypted);
+  console.log(decrypt_ecb(encrypted, key)); // Expected: "HELLO, WORLD!" (Mungkin ada padding)
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-center text-sm lg:flex">

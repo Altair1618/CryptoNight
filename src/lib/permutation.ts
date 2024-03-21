@@ -1,3 +1,5 @@
+import { Block } from "@/model/Block";
+
 // Shift Rows
 export function shiftRows(state: number[][]): number[][] {
   let tempState = [...state];
@@ -74,4 +76,21 @@ export function permutation(state: number[][]): number[][] {
   let shiftedState = shiftRows(state);
   let permutedState = mixColumns(shiftedState);
   return permutedState;
+}
+
+export function permutationString(input: Block): Block {
+  let state = input.getHexData();
+  let stateArray: number[][] = [[], [], [], []];
+
+  for (let i = 0; i < state.length; i += 2) {
+    stateArray[Math.floor(i / 8)].push(parseInt(state[i] + state[i + 1], 16));
+  }
+
+  let permutedState = permutation(stateArray);
+  let result = permutedState
+    .map((row) =>
+      row.map((cell) => cell.toString(16).padStart(2, "0")).join("")
+    )
+    .join("");
+  return new Block(result);
 }
