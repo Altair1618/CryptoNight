@@ -134,3 +134,24 @@ export function decrypt_cfb(data: string, key: string, iv: string): string {
 
   return hex_to_ascii(result);
 }
+
+export function encrypt_ofb(data: string, key: string, iv: string): string {
+  const processed_data: Block[] = preprocess_data(data);
+  const processed_key: Block = preprocess_key(key);
+  const ivBlock: Block = new Block(iv, true);
+
+  let result = "";
+  let feedback = ivBlock;
+
+  for (let block of processed_data) {
+    feedback = encrypt_block_function(feedback, processed_key);
+    const cipherBlock = block.xor(feedback);
+    result += cipherBlock.getHexData();
+  }
+
+  return hex_to_ascii(result);
+}
+
+export function decrypt_ofb(data: string, key: string, iv: string): string {
+  return encrypt_ofb(data, key, iv);
+}
