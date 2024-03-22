@@ -11,7 +11,11 @@ function encrypt_block_function(data: Block, key: Block): Block {
   let scheduled_key: Block[] = generateRoundKeys(key, 16);
 
   for (let i = 0; i < 16; i++) {
-    // result = permutationString(result);
+    // console.log("9.Input", result);
+    result = permutationString(result);
+    // console.log("PUTAR", result);
+    // let test = inversePermutationString(result);
+    // console.log("BALIK", test);
     result = feistelEncryptRound(result, scheduled_key[i]);
     result = substitute(result);
     result = shiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);
@@ -24,11 +28,17 @@ function decrypt_block_function(data: Block, key: Block): Block {
   let result: Block = data;
   let scheduled_key: Block[] = generateRoundKeys(key, 16);
 
+  let x = "1fcd68463a83ea8accecc42373c87f68";
+  console.log("\n\nAWAL");
+  console.log(x);
+  console.log("HASIL");
+  console.log(inversePermutationString(new Block(x)));
+
   for (let i = 15; i >= 0; i--) {
     result = unshiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);
     result = inverseSubstitute(result);
     result = feistelDecryptRound(result, scheduled_key[i]);
-    // result = inversePermutationString(result);
+    result = inversePermutationString(result);
   }
 
   return result;
@@ -203,7 +213,7 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
     let temp = decrypt_block_function(block, processed_key);
     temp = temp.xor(processed_key);
     temp = temp.xor(previousCipherBlock);
-    previousCipherBlock = block
+    previousCipherBlock = block;
     result += temp.getHexData();
   }
 
@@ -213,14 +223,17 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
 export function encrypt_ctr(data: string, key: string, iv: string): string {
   const processed_data: Block[] = preprocess_data(data);
   const processed_key: Block = preprocess_key(key);
-  let counter: Block = preprocess_iv(iv) // Use IV
-  counter.increment() // Increment it first to make it hard to predict
+  let counter: Block = preprocess_iv(iv); // Use IV
+  counter.increment(); // Increment it first to make it hard to predict
 
   let result: string = "";
 
   // Encrypt each block
   for (let block of processed_data) {
-    let encryptedCounter: Block = encrypt_block_function(counter, processed_key);
+    let encryptedCounter: Block = encrypt_block_function(
+      counter,
+      processed_key
+    );
     let temp: Block = block.xor(encryptedCounter);
     result += temp.getHexData();
     counter.increment(); // Increment the counter
