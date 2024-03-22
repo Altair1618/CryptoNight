@@ -59,4 +59,19 @@ export class Block {
 
     return new Block(result, size === BLOCK_SIZE_BYTE / 2);
   }
+
+  // For increment in counter
+  increment(): void {
+    let carry = 1;
+    for (let i = this.data.length - 1; i >= 0 && carry > 0; i--) {
+      let value = this.data[i] + carry;
+      if (value > 255) { // Byte overflow
+        carry = 1;
+        this.data[i] = 0;
+      } else {
+        carry = 0;
+        this.data[i] = value;
+      }
+    }
+  }
 }

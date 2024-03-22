@@ -209,3 +209,27 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
 
   return hex_to_ascii(result);
 }
+
+export function encrypt_ctr(data: string, key: string, iv: string): string {
+  const processed_data: Block[] = preprocess_data(data);
+  const processed_key: Block = preprocess_key(key);
+  let counter: Block = preprocess_iv(iv) // Use IV
+  counter.increment() // Increment it first to make it hard to predict
+
+  let result: string = "";
+
+  // Encrypt each block
+  for (let block of processed_data) {
+    let encryptedCounter: Block = encrypt_block_function(counter, processed_key);
+    let temp: Block = block.xor(encryptedCounter);
+    result += temp.getHexData();
+    counter.increment(); // Increment the counter
+  }
+
+  return hex_to_ascii(result);
+}
+
+export function decrypt_ctr(data: string, key: string, iv: string): string {
+  // Decryption in CTR mode is identical to encryption
+  return encrypt_ctr(data, key, iv);
+}
