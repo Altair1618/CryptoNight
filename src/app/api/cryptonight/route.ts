@@ -13,23 +13,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
         let output = input;
 
         // Process the request based on mode using switch statement
-        switch (mode) {
-            case 'ECB':
-                encrypt ? output = encrypt_ecb(input, key) : output = decrypt_ecb(input, key);
-                break;
-            case 'CBC':
-                encrypt ? output = encrypt_cbc(input, key, initialVector) : output = decrypt_cbc(input, key, initialVector);
-                break;
-            case 'CFB':
-                encrypt ? output = encrypt_cfb(input, key, initialVector) : output = decrypt_cfb(input, key, initialVector);
-                break;
-            case 'OFB':
-                encrypt ? output = encrypt_ofb(input, key, initialVector) : output = decrypt_ofb(input, key, initialVector);
-                break;
-            case 'Counter':
-                encrypt ? output = encrypt_ctr(input, key, initialVector) : output = decrypt_ctr(input, key, initialVector);
-                break;
-        }
+        if (mode == 'ECB')
+            encrypt ? output = encrypt_ecb(input, key) : output = decrypt_ecb(input, key);
+        if (mode == 'CBC')
+            encrypt ? output = encrypt_cbc(input, key, initialVector) : output = decrypt_cbc(input, key, initialVector);
+        if (mode == 'CFB')
+            encrypt ? output = encrypt_cfb(input, key, initialVector) : output = decrypt_cfb(input, key, initialVector);
+        if (mode == 'OFB')
+            encrypt ? output = encrypt_ofb(input, key, initialVector) : output = decrypt_ofb(input, key, initialVector);
+        if (mode == 'Counter')
+            encrypt ? output = encrypt_ctr(input, key, initialVector) : output = decrypt_ctr(input, key, initialVector);
 
         // Prepare to send response
         const data: CipherResponse = {
