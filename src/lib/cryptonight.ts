@@ -11,7 +11,7 @@ function encrypt_block_function(data: Block, key: Block): Block {
   let scheduled_key: Block[] = generateRoundKeys(key, 16);
 
   for (let i = 0; i < 16; i++) {
-    result = permutationString(result);
+    // result = permutationString(result);
     result = feistelEncryptRound(result, scheduled_key[i]);
     result = substitute(result);
     result = shiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);
@@ -28,7 +28,7 @@ function decrypt_block_function(data: Block, key: Block): Block {
     result = unshiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);
     result = inverseSubstitute(result);
     result = feistelDecryptRound(result, scheduled_key[i]);
-    result = inversePermutationString(result);
+    // result = inversePermutationString(result);
   }
 
   return result;

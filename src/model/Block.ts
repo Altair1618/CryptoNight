@@ -63,15 +63,11 @@ export class Block {
   // For increment in counter
   increment(): void {
     let carry = 1;
-    for (let i = this.data.length - 1; i >= 0 && carry > 0; i--) {
-      let value = this.data[i] + carry;
-      if (value > 255) { // Byte overflow
-        carry = 1;
-        this.data[i] = 0;
-      } else {
-        carry = 0;
-        this.data[i] = value;
-      }
+    for (let i = this.data.length - 1; i >= 0; i--) {
+      const sum = this.data[i] + carry;
+      this.data[i] = sum & 0xff; // Take only the least significant byte
+      carry = sum >> 8; // Carry over to the next byte
+      if (carry === 0) break; // No need to continue if carry is zero
     }
   }
 }
