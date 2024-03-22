@@ -35,11 +35,23 @@ function decrypt_block_function(data: Block, key: Block): Block {
 }
 
 function ascii_to_hex(ascii: string): string {
-  return Buffer.from(ascii).toString("hex");
+  let temp: string[] = [];
+
+  for (let i = 0; i < ascii.length; i++) {
+    temp.push(ascii.charCodeAt(i).toString(16).padStart(2, "0"));
+  }
+
+  return temp.join("");
 }
 
 function hex_to_ascii(hex: string): string {
-  return Buffer.from(hex, "hex").toString("utf8");
+  let temp: string[] = [];
+
+  for (let i = 0; i < hex.length; i += 2) {
+    temp.push(String.fromCharCode(parseInt(hex.slice(i, i + 2), 16)));
+  }
+
+  return temp.join("");
 }
 
 function pad(data: string): string {
@@ -61,6 +73,10 @@ function preprocess_data(data: string): Block[] {
 
 function preprocess_key(key: string): Block {
   return new Block(ascii_to_hex(pad(key)));
+}
+
+function preprocess_iv(iv: string): Block {
+  return new Block(ascii_to_hex(pad(iv)));
 }
 
 export function encrypt_ecb(data: string, key: string): string {
@@ -154,4 +170,42 @@ export function encrypt_ofb(data: string, key: string, iv: string): string {
 
 export function decrypt_ofb(data: string, key: string, iv: string): string {
   return encrypt_ofb(data, key, iv);
+}
+
+export function encrypt_cbc(data: string, key: string, iv: string): string {
+  const processed_data: Block[] = preprocess_data(data);
+  const processed_key: Block = preprocess_key(key);
+  const processed_iv: Block = preprocess_iv(iv);
+
+  let result: string = "";
+  let previousCipherBlock: Block = processed_iv;
+
+  for (let block of processed_data) {
+    let temp: Block = block.xor(previousCipherBlock);
+    temp = temp.xor(processed_key);
+    temp = encrypt_block_function(temp, processed_key);
+    previousCipherBlock = temp;
+    result += temp.getHexData();
+  }
+
+  return hex_to_ascii(result);
+}
+
+export function decrypt_cbc(data: string, key: string, iv: string): string {
+  const processed_data: Block[] = preprocess_data(data);
+  const processed_key: Block = preprocess_key(key);
+  const processed_iv: Block = preprocess_iv(iv);
+
+  let result = "";
+  let previousCipherBlock = processed_iv;
+
+  for (let block of processed_data) {
+    let temp = decrypt_block_function(block, processed_key);
+    temp = temp.xor(processed_key);
+    temp = temp.xor(previousCipherBlock);
+    previousCipherBlock = block
+    result += temp.getHexData();
+  }
+
+  return hex_to_ascii(result);
 }
