@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { FileProcessor } from '@/utils';
 import { toast } from "react-toastify";
 import UploadImage from "@/assets/images/upload.png";
-import { CipherBinRequest, CipherBinResponse } from '@/types';
+import { CipherBinRequest, CipherBinResponse, CipherRequest, CipherResponse } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CipherApi from '@/api';
 import { TextProcessor } from '@/utils';
@@ -39,9 +39,10 @@ const FormSchema = z.object({
 
 const InputTextPage: React.FC = () => {
     const [onUpdate, setOnUpdate] = useState<boolean>(false);
-    const [result, setResult] = useState<Uint8Array>();
+    const [result, setResult] = useState<Uint8Array | string>();
     const [resultShow, setResultShow] = useState<string>("");
     const [messageBuffer, setMessageBuffer] = useState<Uint8Array>();
+    const [messageData, setMessageData] = useState<string>("");
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
 
@@ -53,15 +54,27 @@ const InputTextPage: React.FC = () => {
     
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                if (e.target) {
-                    const res = new Uint8Array(e.target.result as ArrayBuffer); // Read as array buffer
-                    setMessageBuffer(res);
-                    setFileType(file.type);
-                    setFileName(file.name);
-                }
-            };
-            reader.readAsArrayBuffer(file);
+            if (file.type === 'text/plain' || file.type === 'application/json') {
+                reader.onload = (e) => {
+                    if (e.target) {
+                        const res = e.target.result as string;
+                        setMessageData(res); // Update messageData with file content
+                        setFileType(file.type);
+                        setFileName(file.name);
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                reader.onload = (e) => {
+                    if (e.target) {
+                        const res = new Uint8Array(e.target.result as ArrayBuffer); // Read as array buffer
+                        setMessageBuffer(res);
+                        setFileType(file.type);
+                        setFileName(file.name);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
     
             if (textRefFileInput.current) {
                 textRefFileInput.current.textContent = 'File uploaded successfully!';
@@ -85,23 +98,41 @@ const InputTextPage: React.FC = () => {
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
-            const payload: CipherBinRequest = {
-                input: new Uint8Array(messageBuffer as Uint8Array),
-                key: data.key,
-                initialVector: data.initialVector,
-                mode: data.mode,
-                encrypt: data.encrypt as boolean
-            };
-            setOnUpdate(true);
-    
-            const submitResponse: CipherBinResponse = await CipherApi.cryptonightBinEncryption(payload);
-            if (submitResponse.success) {
-                let uintRes = new Uint8Array(Object.values(submitResponse.output));
-                setResult(uintRes);
-                if (uintRes.length > 2000) {
-                    setResultShow("Please view the file instead");
-                } else {
-                    setResultShow(TextProcessor.toStringFromUint8Array(uintRes));
+            console.log(fileType);
+            if (fileType === 'text/plain' || fileType === 'application/json') {
+                const payload: CipherRequest = {
+                    input: messageData,
+                    key: data.key,
+                    initialVector: data.initialVector,
+                    mode: data.mode,
+                    encrypt: data.encrypt as boolean
+                };
+                setOnUpdate(true);
+        
+                const submitResponse: CipherResponse = await CipherApi.cryptonightEncryption(payload);
+                if (submitResponse.success) {
+                    setResult(submitResponse.output);
+                    setResultShow(submitResponse.output);
+                }
+            } else {
+                const payload: CipherBinRequest = {
+                    input: new Uint8Array(messageBuffer as Uint8Array),
+                    key: data.key,
+                    initialVector: data.initialVector,
+                    mode: data.mode,
+                    encrypt: data.encrypt as boolean
+                };
+                setOnUpdate(true);
+        
+                const submitResponse: CipherBinResponse = await CipherApi.cryptonightBinEncryption(payload);
+                if (submitResponse.success) {
+                    let uintRes = new Uint8Array(Object.values(submitResponse.output));
+                    setResult(uintRes);
+                    if (uintRes.length > 2000) {
+                        setResultShow("Please view the file instead");
+                    } else {
+                        setResultShow(TextProcessor.toStringFromUint8Array(uintRes));
+                    }
                 }
             }
         } catch (error) {

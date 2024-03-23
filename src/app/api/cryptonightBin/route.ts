@@ -12,6 +12,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         // Create uint8array input
         const uint8Input = new Uint8Array(Object.values(input));
+        console.log(uint8Input);
 
         // Initiate vars
         let successful = true;
