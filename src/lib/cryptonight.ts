@@ -11,11 +11,7 @@ function encrypt_block_function(data: Block, key: Block): Block {
   let scheduled_key: Block[] = generateRoundKeys(key, 16);
 
   for (let i = 0; i < 16; i++) {
-    // console.log("9.Input", result);
     result = permutationString(result);
-    // console.log("PUTAR", result);
-    // let test = inversePermutationString(result);
-    // console.log("BALIK", test);
     result = feistelEncryptRound(result, scheduled_key[i]);
     result = substitute(result);
     result = shiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);
@@ -27,12 +23,6 @@ function encrypt_block_function(data: Block, key: Block): Block {
 function decrypt_block_function(data: Block, key: Block): Block {
   let result: Block = data;
   let scheduled_key: Block[] = generateRoundKeys(key, 16);
-
-  let x = "1fcd68463a83ea8accecc42373c87f68";
-  console.log("\n\nAWAL");
-  console.log(x);
-  console.log("HASIL");
-  console.log(inversePermutationString(new Block(x)));
 
   for (let i = 15; i >= 0; i--) {
     result = unshiftBlock(result, (i + 1) % BLOCK_SIZE_BYTE);

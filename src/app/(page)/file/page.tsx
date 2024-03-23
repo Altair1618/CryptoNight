@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { FileProcessor } from '@/utils';
@@ -18,6 +17,7 @@ import UploadImage from "@/assets/images/upload.png";
 import { CipherRequest, CipherResponse } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CipherApi from '@/api';
+import { TextProcessor } from '@/utils';
 
 const FormSchema = z.object({
     input: z.any(),
@@ -261,12 +261,19 @@ const InputTextPage: React.FC = () => {
                             </Button>
                         </div>}
                     </div>
-                    {result ? 
-                        <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
-                        {result}</div>
-                        : 
-                        <div>Please fill the encyption/decription form above first</div>
-                    }
+                    {result ? (
+                        TextProcessor.containsNonPrintableChars(result) ? (
+                            <div className="text-base">
+                                The result contains characters that may not display correctly here. Please download the result for an accurate representation.
+                            </div>
+                        ) : (
+                            <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
+                                {result}
+                            </div>
+                        )
+                    ) : (
+                        <div>Please fill the encryption/decryption form above first</div>
+                    )}
                 </div>
             </div>
         </div>

@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { CipherRequest, CipherResponse } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CipherApi from '@/api';
+import { TextProcessor } from '@/utils';
 
 const FormSchema = z.object({
     input: z.string().min(1, {
@@ -127,7 +128,7 @@ const InputTextPage: React.FC = () => {
                                     <FormControl>
                                         <Textarea
                                             placeholder="Place your input text here..."
-                                            className="resize-none h-20"
+                                            className="resize-none h-60"
                                             {...field}
                                         />
                                     </FormControl>
@@ -199,6 +200,7 @@ const InputTextPage: React.FC = () => {
                         </Button>
                     </form>
                 </Form>
+                
                 <div className="space-y-2 mt-10 w-full">
                     <div className="flex items-center justify-between">
                         <div className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xl font-bold mb-1">Result</div>
@@ -208,12 +210,19 @@ const InputTextPage: React.FC = () => {
                             </Button>
                         </div>}
                     </div>
-                    {result ? 
-                        <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
-                        {result}</div>
-                        : 
-                        <div>Please fill the encyption/decription form above first</div>
-                    }
+                    {result ? (
+                        TextProcessor.containsNonPrintableChars(result) ? (
+                            <div className="text-base">
+                                The result contains characters that may not display correctly here. Please download the result for an accurate representation.
+                            </div>
+                        ) : (
+                            <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
+                                {result}
+                            </div>
+                        )
+                    ) : (
+                        <div>Please fill the encryption/decryption form above first</div>
+                    )}
                 </div>
             </div>
         </div>

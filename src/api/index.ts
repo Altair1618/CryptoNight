@@ -13,7 +13,6 @@ class CipherApi {
         try {
             const response = await this.axios.post<CipherResponse>('/cryptonight', JSON.stringify(payload));
 
-            console.log(response);
             return response.data;
         } catch (error) {
             throw error;

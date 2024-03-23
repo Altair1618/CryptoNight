@@ -132,42 +132,32 @@ function inversePermutation(state: number[][]): number[][] {
 }
 
 export function permutationString(input: Block): Block {
-  // console.log("5", input);
   let state = input.getHexData();
-  // console.log(state);
   let stateArray: number[][] = [[], [], [], []];
 
   for (let i = 0; i < state.length; i += 2) {
     stateArray[Math.floor(i / 8)].push(parseInt(state[i] + state[i + 1], 16));
   }
-  // console.log("rapi", stateArray);
 
   let permutedState = permutation(stateArray);
-  // console.log("UBAHH", permutedState);
-  // console.log(inversePermutation(permutedState));
   let result = permutedState
     .map((row) =>
       row.map((cell) => cell.toString(16).padStart(2, "0")).join("")
     )
     .join("");
-  // console.log("RES", result);
-  // console.log(new Block(result));
+
   return new Block(result);
 }
 
 export function inversePermutationString(input: Block): Block {
-  // console.log("YES HERE");
   let state = input.getHexData();
-  // console.log(state);
   let stateArray: number[][] = [[], [], [], []];
 
   for (let i = 0; i < state.length; i += 2) {
     stateArray[Math.floor(i / 8)].push(parseInt(state[i] + state[i + 1], 16));
   }
-  // console.log(stateArray);
 
   let restoredState = inversePermutation(stateArray);
-  // console.log("UBAHH", restoredState);
   let result = restoredState
     .map((row) =>
       row.map((cell) => cell.toString(16).padStart(2, "0")).join("")

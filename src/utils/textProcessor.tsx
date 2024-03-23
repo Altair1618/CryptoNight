@@ -57,6 +57,14 @@ class TextProcessor {
 
         return result;
     }
+
+    static containsNonPrintableChars(str: string): boolean {
+        const chars = Array.from(str);
+        return chars.some(char => {
+            const charCode = char.charCodeAt(0);
+            return !(charCode > 31 && charCode < 127) && charCode !== 10 && charCode !== 13 && charCode !== 9;
+        });
+    }
 }
 
 export default TextProcessor;

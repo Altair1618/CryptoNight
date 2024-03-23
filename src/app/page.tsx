@@ -1,17 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { Block } from "@/model/Block";
-import { decrypt_ctr, encrypt_ctr } from "@/lib/cryptonight";
 
-export default function Home() {
-  let input: string = "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.";
-  let key: string = "YELLOW SUBMARINE";
-  let iv: string = "YELLOW SUBMARINE";
-  
-  const encrypted = encrypt_ctr(input, key, iv);
-  console.log(encrypted);
-  console.log(decrypt_ctr(encrypted, key, iv)); // Expected: "HELLO, WORLD!" (Mungkin ada padding)
-  
+export default function Home() {  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-center text-sm lg:flex">
