@@ -9,6 +9,8 @@ import {
   encrypt_cfb_bin,
   encrypt_ecb_bin,
   encrypt_ofb_bin,
+  encrypt_ctr_bin,
+  decrypt_ctr_bin
 } from "@/lib/cryptonight";
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -20,7 +22,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Create uint8array input
     const uint8Input = new Uint8Array(Object.values(input));
-    console.log(uint8Input);
 
     // Initiate vars
     let successful = true;
@@ -39,6 +40,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
       encrypt
         ? (output = encrypt_cfb_bin(uint8Input, key, initialVector))
         : (output = decrypt_cfb_bin(uint8Input, key, initialVector));
+    // Process the request based on mode using switch statement
+    if (mode == "ECB")
+      encrypt
+        ? (output = encrypt_ecb_bin(uint8Input, key))
+        : (output = decrypt_ecb_bin(uint8Input, key));
+    if (mode == "Counter")
+      encrypt
+        ? (output = encrypt_ctr_bin(uint8Input, key, initialVector))
+        : (output = decrypt_ctr_bin(uint8Input, key, initialVector));
 
     // Prepare to send response
     const data: CipherBinResponse = {

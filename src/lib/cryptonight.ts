@@ -381,3 +381,38 @@ export function decrypt_cfb_bin(
 
   return concatUint8Arrays(decryptedBlocks);
 }
+
+export function encrypt_ctr_bin(data: Uint8Array, key: string, iv: string): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "encrypt");
+  const processed_key: Block = preprocess_key(key);
+  let counter: Block = preprocess_iv(iv); // Use IV
+  counter.increment(); // Increment it first to make it hard to predict
+
+  const encryptedBlocks: Uint8Array[] = [];
+  for (let block of processed_data) {
+    let encryptedCounter: Block = encrypt_block_function(counter, processed_key);
+    let temp: Block = block.xor(encryptedCounter);
+    encryptedBlocks.push(temp.getData());
+    counter.increment(); // Increment the counter
+  }
+
+  return concatUint8Arrays(encryptedBlocks);
+}
+
+export function decrypt_ctr_bin(data: Uint8Array, key: string, iv: string): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "decrypt");
+  const processed_key: Block = preprocess_key(key);
+  let counter: Block = preprocess_iv(iv); // Use IV
+  counter.increment(); // Increment it first to make it hard to predict
+
+  const decryptedBlocks: Uint8Array[] = [];
+  for (let block of processed_data) {
+    let decryptedCounter: Block = encrypt_block_function(counter, processed_key);
+    let temp: Block = block.xor(decryptedCounter);
+    decryptedBlocks.push(temp.getData());
+    counter.increment(); // Increment the counter
+  }
+
+  let joined = concatUint8Arrays(decryptedBlocks);
+  return removeTrailingZeros(joined);
+}
