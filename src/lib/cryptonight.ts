@@ -312,6 +312,45 @@ export function decrypt_ecb_bin(data: Uint8Array, key: string): Uint8Array {
   return removeTrailingZeros(joined);
 }
 
+export function encrypt_cbc_bin(data: Uint8Array, key: string, iv: string): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "encrypt");
+  const processed_key: Block = preprocess_key(key);
+  const processed_iv: Block = preprocess_iv(iv);
+
+  const encryptedBlocks: Uint8Array[] = [];
+  let previousCipherBlock: Block = processed_iv;
+
+  for (let block of processed_data) {
+    let temp: Block = block.xor(previousCipherBlock);
+    temp = temp.xor(processed_key);
+    temp = encrypt_block_function(temp, processed_key);
+    previousCipherBlock = temp;
+    encryptedBlocks.push(temp.getData());
+  }
+
+  return concatUint8Arrays(encryptedBlocks);
+}
+
+export function decrypt_cbc_bin(data: Uint8Array, key: string, iv: string): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "decrypt");
+  const processed_key: Block = preprocess_key(key);
+  const processed_iv: Block = preprocess_iv(iv);
+
+  const decryptedBlocks: Uint8Array[] = [];
+  let previousCipherBlock = processed_iv;
+
+  for (let block of processed_data) {
+    let temp = decrypt_block_function(block, processed_key);
+    temp = temp.xor(processed_key);
+    temp = temp.xor(previousCipherBlock);
+    previousCipherBlock = block;
+    decryptedBlocks.push(temp.getData());
+  }
+
+  let joined = concatUint8Arrays(decryptedBlocks);
+  return removeTrailingZeros(joined);
+}
+
 export function encrypt_ctr_bin(data: Uint8Array, key: string, iv: string): Uint8Array {
   const processed_data: Block[] = preprocess_data_bin(data, "encrypt");
   const processed_key: Block = preprocess_key(key);

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Buffer } from 'buffer';
-import { parse } from 'url';
 import { CipherBinRequest, CipherBinResponse } from "@/types";
-import { decrypt_ctr_bin, decrypt_ecb_bin, encrypt_ctr_bin, encrypt_ecb_bin } from "@/lib/cryptonight";
+import { decrypt_cbc_bin, decrypt_ctr_bin, decrypt_ecb_bin, encrypt_cbc_bin, encrypt_ctr_bin, encrypt_ecb_bin } from "@/lib/cryptonight";
 
 export async function POST(req: NextRequest, res: NextResponse) {
     try {
@@ -20,6 +18,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         // Process the request based on mode using switch statement
         if (mode == 'ECB')
             encrypt ? output = encrypt_ecb_bin(uint8Input, key) : output = decrypt_ecb_bin(uint8Input, key);
+        if (mode == 'CBC')
+            encrypt ? output = encrypt_cbc_bin(uint8Input, key, initialVector) : output = decrypt_cbc_bin(uint8Input, key, initialVector);
         if (mode == 'Counter')
             encrypt ? output = encrypt_ctr_bin(uint8Input, key, initialVector) : output = decrypt_ctr_bin(uint8Input, key, initialVector);
 
