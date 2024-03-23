@@ -237,10 +237,10 @@ export function decrypt_ctr(data: string, key: string, iv: string): string {
   return encrypt_ctr(data, key, iv);
 }
 
-
 // Handle All the binary functions
 function padArray(data: Uint8Array, status: string): Uint8Array {
-  const pad_length = BLOCK_SIZE_BYTE - (((data.length - 1) % BLOCK_SIZE_BYTE) + 1);
+  const pad_length =
+    BLOCK_SIZE_BYTE - (((data.length - 1) % BLOCK_SIZE_BYTE) + 1);
   const num_zeros_added = pad_length - 1; // Number of zeros added at the end
   const paddedArray = new Uint8Array(data.length + pad_length);
   paddedArray.set(data);
@@ -308,6 +308,76 @@ export function decrypt_ecb_bin(data: Uint8Array, key: string): Uint8Array {
     decryptedBlocks.push(temp.getData());
   }
 
-  let joined = concatUint8Arrays(decryptedBlocks)
+  let joined = concatUint8Arrays(decryptedBlocks);
   return removeTrailingZeros(joined);
+}
+
+export function encrypt_ofb_bin(
+  data: Uint8Array,
+  key: string,
+  iv: string
+): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "encrypt");
+  const processed_key: Block = preprocess_key(key);
+  let feedback: Block = new Block(iv, true);
+
+  const encryptedBlocks: Uint8Array[] = [];
+
+  for (let block of processed_data) {
+    feedback = encrypt_block_function(feedback, processed_key);
+    const cipherBlock = block.xor(feedback);
+    encryptedBlocks.push(cipherBlock.getData());
+  }
+
+  return concatUint8Arrays(encryptedBlocks);
+}
+
+export function decrypt_ofb_bin(
+  data: Uint8Array,
+  key: string,
+  iv: string
+): Uint8Array {
+  return encrypt_ofb_bin(data, key, iv);
+}
+
+export function encrypt_cfb_bin(
+  data: Uint8Array,
+  key: string,
+  iv: string
+): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "encrypt");
+  const processed_key: Block = preprocess_key(key);
+  let feedback: Block = new Block(iv, true);
+
+  const encryptedBlocks: Uint8Array[] = [];
+
+  for (let block of processed_data) {
+    let cipherBlock = encrypt_block_function(feedback, processed_key);
+    cipherBlock = block.xor(cipherBlock);
+    feedback = cipherBlock;
+    encryptedBlocks.push(cipherBlock.getData());
+  }
+
+  return concatUint8Arrays(encryptedBlocks);
+}
+
+export function decrypt_cfb_bin(
+  data: Uint8Array,
+  key: string,
+  iv: string
+): Uint8Array {
+  const processed_data: Block[] = preprocess_data_bin(data, "decrypt");
+  const processed_key: Block = preprocess_key(key);
+  let feedback: Block = new Block(iv, true);
+
+  const decryptedBlocks: Uint8Array[] = [];
+
+  for (let block of processed_data) {
+    let cipherBlock = encrypt_block_function(feedback, processed_key);
+    let plainBlock = block.xor(cipherBlock);
+    feedback = block;
+    decryptedBlocks.push(plainBlock.getData());
+  }
+
+  return concatUint8Arrays(decryptedBlocks);
 }
