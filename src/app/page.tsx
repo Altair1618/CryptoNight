@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { decrypt_ecb_bin, encrypt_ecb_bin } from "@/lib/cryptonight";
 
 export default function Home() {  
   return (

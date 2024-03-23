@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { FileProcessor } from '@/utils';
 import { toast } from "react-toastify";
 import UploadImage from "@/assets/images/upload.png";
-import { CipherRequest, CipherResponse } from '@/types';
+import { CipherBinRequest, CipherBinResponse } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CipherApi from '@/api';
 import { TextProcessor } from '@/utils';
@@ -39,8 +39,9 @@ const FormSchema = z.object({
 
 const InputTextPage: React.FC = () => {
     const [onUpdate, setOnUpdate] = useState<boolean>(false);
-    const [result, setResult] = useState<string>("");
-    const [messageData, setMessageData] = useState<string>("");
+    const [result, setResult] = useState<Uint8Array>();
+    const [resultShow, setResultShow] = useState<string>("");
+    const [messageBuffer, setMessageBuffer] = useState<Uint8Array>();
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
 
@@ -54,13 +55,13 @@ const InputTextPage: React.FC = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 if (e.target) {
-                    const res = e.target.result as string;
-                    setMessageData(res); // Update messageData with file content
+                    const res = new Uint8Array(e.target.result as ArrayBuffer); // Read as array buffer
+                    setMessageBuffer(res);
                     setFileType(file.type);
                     setFileName(file.name);
                 }
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
     
             if (textRefFileInput.current) {
                 textRefFileInput.current.textContent = 'File uploaded successfully!';
@@ -68,8 +69,6 @@ const InputTextPage: React.FC = () => {
             if (infoRefFileInput.current) {
                 infoRefFileInput.current.textContent = `${file.name}`;
             }
-        } else {
-            setMessageData(""); // Reset messageData if no file is selected
         }
     };    
 
@@ -86,8 +85,8 @@ const InputTextPage: React.FC = () => {
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
-            const payload: CipherRequest = {
-                input: messageData,
+            const payload: CipherBinRequest = {
+                input: new Uint8Array(messageBuffer as Uint8Array),
                 key: data.key,
                 initialVector: data.initialVector,
                 mode: data.mode,
@@ -95,9 +94,15 @@ const InputTextPage: React.FC = () => {
             };
             setOnUpdate(true);
     
-            const submitResponse: CipherResponse = await CipherApi.cryptonightEncryption(payload);
+            const submitResponse: CipherBinResponse = await CipherApi.cryptonightBinEncryption(payload);
             if (submitResponse.success) {
-                setResult(submitResponse.output);
+                let uintRes = new Uint8Array(Object.values(submitResponse.output));
+                setResult(uintRes);
+                if (uintRes.length > 2000) {
+                    setResultShow("Please view the file instead");
+                } else {
+                    setResultShow(TextProcessor.toStringFromUint8Array(uintRes));
+                }
             }
         } catch (error) {
             toast.error((error as any)?.message || 'Server is unreachable. Please try again later.');
@@ -108,12 +113,12 @@ const InputTextPage: React.FC = () => {
 
     const handleDownload = () => {
         if (fileType !== "") {
-            const blob = new Blob([result], { type: fileType });
+            const blob = new Blob([result as Uint8Array], { type: fileType });
             const file = new File([blob], fileName, { type: fileType });
       
             FileProcessor.downloadFile(file, fileName);
         } else {
-            if (!FileProcessor.download(result, "Standard-vigenere-result.txt")) {
+            if (!FileProcessor.download(TextProcessor.toStringFromUint8Array(result as Uint8Array), "Extended-vigenere-result.txt")) {
                 alert("Download failed");
             }
         }
@@ -182,7 +187,7 @@ const InputTextPage: React.FC = () => {
                                         </div>
                                     </FormLabel>
                                     <FormControl>
-                                        <Input type="file" accept=".txt" onChange={showFile} className="hidden"/>
+                                        <Input type="file" onChange={showFile} className="hidden"/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -262,13 +267,13 @@ const InputTextPage: React.FC = () => {
                         </div>}
                     </div>
                     {result ? (
-                        TextProcessor.containsNonPrintableChars(result) ? (
+                        TextProcessor.containsNonPrintableChars(resultShow) ? (
                             <div className="text-base">
                                 The result contains characters that may not display correctly here. Please download the result for an accurate representation.
                             </div>
                         ) : (
                             <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
-                                {result}
+                                {resultShow}
                             </div>
                         )
                     ) : (

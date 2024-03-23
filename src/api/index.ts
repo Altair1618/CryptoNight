@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CipherRequest, CipherResponse } from '@/types';
+import { CipherBinRequest, CipherBinResponse, CipherRequest, CipherResponse } from '@/types';
 
 class CipherApi {
     private static axios = axios.create({
@@ -18,6 +18,16 @@ class CipherApi {
             throw error;
         }
     }
+
+    static async cryptonightBinEncryption(payload: CipherBinRequest): Promise<CipherBinResponse> {
+        try {
+            const response = await this.axios.post<CipherBinResponse>('/cryptonightBin', JSON.stringify(payload));
+            
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }    
 }
 
 export default CipherApi;
