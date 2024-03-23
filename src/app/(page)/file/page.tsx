@@ -99,7 +99,6 @@ const InputTextPage: React.FC = () => {
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
-            console.log(fileType);
             if (fileType === 'text/plain' || fileType === 'application/json') {
                 const payload: CipherRequest = {
                     input: messageData,
