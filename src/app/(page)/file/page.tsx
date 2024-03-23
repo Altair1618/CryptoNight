@@ -45,6 +45,7 @@ const InputTextPage: React.FC = () => {
     const [messageData, setMessageData] = useState<string>("");
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
+    const [executionTime, setExecutionTime] = useState<string>("");
 
     const textRefFileInput = useRef<HTMLParagraphElement>(null);
     const infoRefFileInput = useRef<HTMLParagraphElement>(null);
@@ -113,6 +114,7 @@ const InputTextPage: React.FC = () => {
                 if (submitResponse.success) {
                     setResult(submitResponse.output);
                     setResultShow(submitResponse.output);
+                    setExecutionTime(submitResponse.time);
                 }
             } else {
                 const payload: CipherBinRequest = {
@@ -133,6 +135,7 @@ const InputTextPage: React.FC = () => {
                     } else {
                         setResultShow(TextProcessor.toStringFromUint8Array(uintRes));
                     }
+                    setExecutionTime(submitResponse.time);
                 }
             }
         } catch (error) {
@@ -298,15 +301,18 @@ const InputTextPage: React.FC = () => {
                         </div>}
                     </div>
                     {result ? (
-                        TextProcessor.containsNonPrintableChars(resultShow) ? (
-                            <div className="text-base">
-                                The result contains characters that may not display correctly here. Please download the result for an accurate representation.
-                            </div>
-                        ) : (
-                            <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
-                                {resultShow}
-                            </div>
-                        )
+                        <>
+                            <div className="text-base font-bold">Execution time: {executionTime}</div>
+                            {TextProcessor.containsNonPrintableChars(resultShow) ? (
+                                <div className="text-base">
+                                    The result contains characters that may not display correctly here. Please download the result for an accurate representation.
+                                </div>
+                            ) : (
+                                <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
+                                    {resultShow}
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div>Please fill the encryption/decryption form above first</div>
                     )}

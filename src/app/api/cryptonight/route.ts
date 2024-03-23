@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CipherRequest, CipherResponse } from '@/types';
+import { timeExecution } from '@/utils';
 import { encrypt_ctr, decrypt_ctr, encrypt_ecb, decrypt_ecb, encrypt_cfb, decrypt_cfb, encrypt_ofb, decrypt_ofb, encrypt_cbc, decrypt_cbc } from '@/lib/cryptonight';
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
         let successful = true;
         let output = input;
 
+        // Start measuring the time
+        var startTime = performance.now();
+
         // Process the request based on mode using switch statement
         if (mode == 'ECB')
             encrypt ? output = encrypt_ecb(input, key) : output = decrypt_ecb(input, key);
@@ -23,11 +27,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
             encrypt ? output = encrypt_ofb(input, key, initialVector) : output = decrypt_ofb(input, key, initialVector);
         if (mode == 'Counter')
             encrypt ? output = encrypt_ctr(input, key, initialVector) : output = decrypt_ctr(input, key, initialVector);
+        
+        // End measuring the time
+        var endTime = performance.now();
 
         // Prepare to send response
         const data: CipherResponse = {
             success: successful,
-            output: output
+            output: output,
+            time: timeExecution(endTime - startTime)
         }
 
         return NextResponse.json(data, { status: 200 }); // sucess

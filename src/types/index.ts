@@ -11,6 +11,7 @@ export type CipherRequest = {
 export type CipherResponse = {
     success: boolean;
     output: string;
+    time: string;
 }
 
 // For Block Cipher Binary File Request
@@ -26,4 +27,5 @@ export type CipherBinRequest = {
 export type CipherBinResponse = {
     success: boolean;
     output: Uint8Array;
+    time: string;
 }

@@ -41,6 +41,7 @@ const FormSchema = z.object({
 const InputTextPage: React.FC = () => {
     const [onUpdate, setOnUpdate] = useState<boolean>(false);
     const [result, setResult] = useState<string>("");
+    const [executionTime, setExecutionTime] = useState<string>("");
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -67,6 +68,7 @@ const InputTextPage: React.FC = () => {
             const submitResponse: CipherResponse = await CipherApi.cryptonightEncryption(payload);
             if (submitResponse.success) {
                 setResult(submitResponse.output);
+                setExecutionTime(submitResponse.time);
             }
         } catch (error) {
             toast.error((error as any)?.message || 'Server is unreachable. Please try again later.');
@@ -211,15 +213,18 @@ const InputTextPage: React.FC = () => {
                         </div>}
                     </div>
                     {result ? (
-                        TextProcessor.containsNonPrintableChars(result) ? (
-                            <div className="text-base">
-                                The result contains characters that may not display correctly here. Please download the result for an accurate representation.
-                            </div>
-                        ) : (
-                            <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
-                                {result}
-                            </div>
-                        )
+                        <>
+                            <div className="text-base font-bold">Execution time: {executionTime}</div>
+                            {TextProcessor.containsNonPrintableChars(result) ? (
+                                <div className="text-base">
+                                    The result contains characters that may not display correctly here. Please download the result for an accurate representation.
+                                </div>
+                            ) : (
+                                <div className="mx-auto h-40 w-full overflow-y-auto break-words rounded-md border bg-background px-3 py-2 ring-offset-background md:text-sm text-base text-wrap">
+                                    {result}
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div>Please fill the encryption/decryption form above first</div>
                     )}
