@@ -61,7 +61,8 @@ function pad(data: string): string {
 }
 
 function preprocess_data(data: string): Block[] {
-  const hex_data: string = ascii_to_hex(pad(data));
+  let padded = pad(data);
+  const hex_data: string = ascii_to_hex(padded);
 
   let processed_data: Block[] = [];
   for (let i = 0; i < hex_data.length; i += BLOCK_SIZE_BYTE * 2) {
@@ -125,9 +126,11 @@ export function encrypt_cfb(data: string, key: string, iv: string): string {
     cipherBlock = block.xor(cipherBlock);
     previousCipherBlock = cipherBlock;
     result += cipherBlock.getHexData();
+    count++;
   }
 
-  return hex_to_ascii(result);
+  let res = hex_to_ascii(result);
+  return res;
 }
 
 export function decrypt_cfb(data: string, key: string, iv: string): string {
@@ -205,9 +208,11 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
     temp = temp.xor(previousCipherBlock);
     previousCipherBlock = block;
     result += temp.getHexData();
+    count++;
   }
 
-  return hex_to_ascii(result);
+  let res = hex_to_ascii(result);
+  return res;
 }
 
 export function encrypt_ctr(data: string, key: string, iv: string): string {
@@ -415,10 +420,12 @@ export function decrypt_cbc_bin(data: Uint8Array, key: string, iv: string): Uint
     temp = temp.xor(previousCipherBlock);
     previousCipherBlock = block;
     decryptedBlocks.push(temp.getData());
+    count++;
   }
 
   let joined = concatUint8Arrays(decryptedBlocks);
-  return removeTrailingZeros(joined);
+  let joined2 = removeTrailingZeros(joined);
+  return joined2;
 }
 
 export function encrypt_ctr_bin(data: Uint8Array, key: string, iv: string): Uint8Array {

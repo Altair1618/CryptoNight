@@ -45,6 +45,7 @@ const InputTextPage: React.FC = () => {
     const [messageData, setMessageData] = useState<string>("");
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
+    const [extension, setExtension] = useState<string>();
     const [executionTime, setExecutionTime] = useState<string>("");
 
     const textRefFileInput = useRef<HTMLParagraphElement>(null);
@@ -54,14 +55,18 @@ const InputTextPage: React.FC = () => {
         const file = e.target.files?.[0];
     
         if (file) {
+            // Get the file
+            setFileType(file.type);
+            setFileName(file.name);
+            setExtension(file.name.split('.').pop()); // Extracting extension values
+
+            // Read the content
             const reader = new FileReader();
-            if (file.type === 'text/plain' || file.type === 'application/json') {
+            if (file.type === 'text/plain' || file.type === 'application/json' || file.name.split('.').pop() === 'sql') {
                 reader.onload = (e) => {
                     if (e.target) {
                         const res = e.target.result as string;
                         setMessageData(res); // Update messageData with file content
-                        setFileType(file.type);
-                        setFileName(file.name);
                     }
                 };
                 reader.readAsText(file);
@@ -70,8 +75,6 @@ const InputTextPage: React.FC = () => {
                     if (e.target) {
                         const res = new Uint8Array(e.target.result as ArrayBuffer); // Read as array buffer
                         setMessageBuffer(res);
-                        setFileType(file.type);
-                        setFileName(file.name);
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -99,7 +102,7 @@ const InputTextPage: React.FC = () => {
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
-            if (fileType === 'text/plain' || fileType === 'application/json') {
+            if (fileType === 'text/plain' || fileType === 'application/json' || extension === 'sql') {
                 const payload: CipherRequest = {
                     input: messageData,
                     key: data.key,
@@ -151,8 +154,21 @@ const InputTextPage: React.FC = () => {
       
             FileProcessor.downloadFile(file, fileName);
         } else {
-            if (!FileProcessor.download(TextProcessor.toStringFromUint8Array(result as Uint8Array), "Extended-vigenere-result.txt")) {
-                alert("Download failed");
+            if (extension) {
+                if (extension === 'sql') {
+                    if (!FileProcessor.download(resultShow, `${fileName}`)) {
+                        alert("Download failed");
+                    }
+                } else {
+                    if (!FileProcessor.download(TextProcessor.toStringFromUint8Array(result as Uint8Array), `${fileName}`)) {
+                        alert("Download failed");
+                    }
+                }
+            }
+            else {
+                if (!FileProcessor.download(TextProcessor.toStringFromUint8Array(result as Uint8Array), `${fileName}`)) {
+                    alert("Download failed");
+                }
             }
         }
     }
