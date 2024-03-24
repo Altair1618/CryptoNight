@@ -126,7 +126,6 @@ export function encrypt_cfb(data: string, key: string, iv: string): string {
     cipherBlock = block.xor(cipherBlock);
     previousCipherBlock = cipherBlock;
     result += cipherBlock.getHexData();
-    count++;
   }
 
   let res = hex_to_ascii(result);
@@ -208,7 +207,6 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
     temp = temp.xor(previousCipherBlock);
     previousCipherBlock = block;
     result += temp.getHexData();
-    count++;
   }
 
   let res = hex_to_ascii(result);
@@ -420,7 +418,6 @@ export function decrypt_cbc_bin(data: Uint8Array, key: string, iv: string): Uint
     temp = temp.xor(previousCipherBlock);
     previousCipherBlock = block;
     decryptedBlocks.push(temp.getData());
-    count++;
   }
 
   let joined = concatUint8Arrays(decryptedBlocks);
