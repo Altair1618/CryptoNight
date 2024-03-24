@@ -54,6 +54,19 @@ function hex_to_ascii(hex: string): string {
   return temp.join("");
 }
 
+function cleanTrailingZeros(inputString: string): string {
+  if (!inputString) {
+      return inputString;
+  }
+
+  let idx = inputString.length - 1;
+  while (idx >= 0 && inputString[idx] === '0') {
+      idx--;
+  }
+
+  return inputString.slice(0, idx + 1);
+}
+
 function pad(data: string): string {
   const pad_length =
     BLOCK_SIZE_BYTE - (((data.length - 1) % BLOCK_SIZE_BYTE) + 1);
@@ -107,7 +120,7 @@ export function decrypt_ecb(data: string, key: string): string {
   }
 
   result = hex_to_ascii(result);
-  return result;
+  return cleanTrailingZeros(result);
 }
 
 export function encrypt_cfb(data: string, key: string, iv: string): string {
@@ -150,7 +163,7 @@ export function decrypt_cfb(data: string, key: string, iv: string): string {
     result += plainBlock.getHexData();
   }
 
-  return hex_to_ascii(result);
+  return cleanTrailingZeros(hex_to_ascii(result));
 }
 
 export function encrypt_ofb(data: string, key: string, iv: string): string {
@@ -171,7 +184,7 @@ export function encrypt_ofb(data: string, key: string, iv: string): string {
 }
 
 export function decrypt_ofb(data: string, key: string, iv: string): string {
-  return encrypt_ofb(data, key, iv);
+  return cleanTrailingZeros(encrypt_ofb(data, key, iv));
 }
 
 export function encrypt_cbc(data: string, key: string, iv: string): string {
@@ -210,7 +223,7 @@ export function decrypt_cbc(data: string, key: string, iv: string): string {
   }
 
   let res = hex_to_ascii(result);
-  return res;
+  return cleanTrailingZeros(res);
 }
 
 export function encrypt_ctr(data: string, key: string, iv: string): string {
@@ -237,7 +250,7 @@ export function encrypt_ctr(data: string, key: string, iv: string): string {
 
 export function decrypt_ctr(data: string, key: string, iv: string): string {
   // Decryption in CTR mode is identical to encryption
-  return encrypt_ctr(data, key, iv);
+  return cleanTrailingZeros(encrypt_ctr(data, key, iv));
 }
 
 // Handle All the binary functions
