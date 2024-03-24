@@ -2,12 +2,12 @@ import React from "react";
 import Link from "next/link";
 import { decrypt_ecb_bin, encrypt_ecb_bin } from "@/lib/cryptonight";
 
-export default function Home() {  
+export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-center text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b pb-6 pt-8 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
-        Design and Implementation Results of the 'new' Block cipher
+          Design and Implementation Results of the &apos;new&apos; Block cipher
         </p>
       </div>
 
@@ -16,7 +16,10 @@ export default function Home() {
       </div>
 
       <div className="mb-32 flex items-center justify-center text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <Link href="/text" className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30 mr-3">
+        <Link
+          href="/text"
+          className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30 mr-3"
+        >
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Text Input{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
@@ -28,7 +31,10 @@ export default function Home() {
           </p>
         </Link>
 
-        <Link href="/file" className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30">
+        <Link
+          href="/file"
+          className="group rounded-lg border border-transparent px-5 py-4 hover:border-zinc-700 hover:bg-zinc-800/30"
+        >
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Binary File Input{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
